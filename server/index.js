@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth");
 const usageRoutes = require("./routes/usage");
 const dashboardRoutes = require("./routes/dashboard");
 const chatRoutes = require("./routes/chat");
+const earlyAccessRoutes = require("./routes/earlyAccess");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/usage", usageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/early-access", earlyAccessRoutes);
 
 app.use(express.static(path.join(__dirname, "..")));
 

@@ -91,7 +91,7 @@ router.get("/reports", async (req, res) => {
     if (!hotel) return res.status(404).json({ error: "Hotel not found." });
 
     const result = await pool.query(
-      `SELECT date_trunc('month', entry_date) AS month, array_agg(usage_entries.*) AS rows
+      `SELECT date_trunc('month', entry_date) AS month, json_agg(usage_entries.*) AS rows
        FROM usage_entries
        WHERE hotel_id = $1 AND entry_date >= (CURRENT_DATE - INTERVAL '6 months')
        GROUP BY month

@@ -635,9 +635,15 @@
   .app-overlay-brand span{ font-family:'Fraunces',serif; font-size:1.02rem; color:var(--ink); }
   .app-overlay-tag{
     font-size:0.82rem; color:var(--ink-soft); padding:4px 10px;
-    border:1px solid var(--line); border-radius:20px;
+    border:1px solid var(--line); border-radius:20px; white-space:nowrap;
   }
   .app-overlay-frame{ flex:1 1 auto; overflow:auto; -webkit-overflow-scrolling:touch; }
+  @media (max-width:640px){
+    .app-overlay-bar{ padding:10px 14px; gap:8px; }
+    .app-overlay-brand span{ display:none; }
+    .app-overlay-tag{ font-size:0.72rem; padding:3px 8px; }
+    #closeAppOverlay{ padding:8px 12px; font-size:0.85rem; }
+  }
   body.overlay-open{ overflow:hidden; }
 
   /* ---------- Preloader ---------- */
@@ -1366,9 +1372,9 @@
             <div class="form-row">
               <label for="roomCountInput">Number of rooms</label>
               <input type="number" id="roomCountInput" min="1" placeholder="e.g. 60">
-              <div class="form-note">This is a demo form — no data is sent anywhere.</div>
             </div>
-            <button type="submit" class="btn btn-primary">Send request</button>
+            <div class="form-note" id="contactError" style="display:none; color:var(--brass);"></div>
+            <button type="submit" class="btn btn-primary" id="contactSubmit">Send request</button>
           </form>
           <div class="contact-success" id="contactSuccess">
             <h3>Thanks — we'll be in touch.</h3>
@@ -2241,7 +2247,7 @@ function TopBarGreeting() {
 
 /* ---------------------------------- resource usage page ---------------------------------- */
 
-function ResourcesPage() {
+function ResourcesPage({ setMobileOpen }) {
   const [resource, setResource] = useState("electricity");
   const [range, setRange] = useState("7");
   const meta = RESOURCE_META[resource];
@@ -2258,7 +2264,7 @@ function ResourcesPage() {
 
   return (
     <div>
-      <TopBar title="Resource Usage" subtitle="Track consumption by resource type and time period" setMobileOpen={() => {}} />
+      <TopBar title="Resource Usage" subtitle="Track consumption by resource type and time period" setMobileOpen={setMobileOpen} />
       <Card className="mb-4">
         <div className="flex flex-wrap items-center gap-2 mb-2">
           {Object.keys(RESOURCE_META).map((r) => {
@@ -2313,10 +2319,10 @@ function ResourcesPage() {
 
 /* ---------------------------------- AI insights page ---------------------------------- */
 
-function InsightsPage() {
+function InsightsPage({ setMobileOpen }) {
   return (
     <div>
-      <TopBar title="AI Sustainability Insights" subtitle="Anomalies and opportunities detected across your property" setMobileOpen={() => {}} />
+      <TopBar title="AI Sustainability Insights" subtitle="Anomalies and opportunities detected across your property" setMobileOpen={setMobileOpen} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {INSIGHTS.map((i) => <InsightCard key={i.key} insight={i} />)}
       </div>
@@ -2327,10 +2333,10 @@ function InsightsPage() {
 
 /* ---------------------------------- savings page ---------------------------------- */
 
-function SavingsPage() {
+function SavingsPage({ setMobileOpen }) {
   return (
     <div>
-      <TopBar title="Sustainability Savings" subtitle="Where environmental improvements are translating into cost savings" setMobileOpen={() => {}} />
+      <TopBar title="Sustainability Savings" subtitle="Where environmental improvements are translating into cost savings" setMobileOpen={setMobileOpen} />
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2"><SavingsCard /></div>
         <Card>
@@ -2350,7 +2356,7 @@ function SavingsPage() {
 
 /* ---------------------------------- reports page ---------------------------------- */
 
-function ReportsPage() {
+function ReportsPage({ setMobileOpen }) {
   const reports = [
     { month: "September 2026", score: 82, saved: "18.4%", savings: 284500, co2: "1.8 t" },
     { month: "August 2026", score: 79, saved: "15.1%", savings: 241000, co2: "1.5 t" },
@@ -2358,7 +2364,7 @@ function ReportsPage() {
   ];
   return (
     <div>
-      <TopBar title="Sustainability Reports" subtitle="Monthly performance summaries, ready to share" setMobileOpen={() => {}} />
+      <TopBar title="Sustainability Reports" subtitle="Monthly performance summaries, ready to share" setMobileOpen={setMobileOpen} />
       <div className="space-y-4">
         {reports.map((r, i) => (
           <Card key={r.month} className="flex flex-wrap items-center justify-between gap-4">
@@ -2397,7 +2403,7 @@ function ReportsPage() {
 
 /* ---------------------------------- profile page ---------------------------------- */
 
-function ProfilePage() {
+function ProfilePage({ setMobileOpen }) {
   const stats = [
     { label: "Water Saved", value: "14%", icon: Droplet, color: C.blue },
     { label: "Energy Saved", value: "18%", icon: Zap, color: C.primary },
@@ -2406,7 +2412,7 @@ function ProfilePage() {
   ];
   return (
     <div>
-      <TopBar title="Hotel Sustainability Profile" subtitle="A shareable snapshot for guests, partners, and booking platforms" setMobileOpen={() => {}} />
+      <TopBar title="Hotel Sustainability Profile" subtitle="A shareable snapshot for guests, partners, and booking platforms" setMobileOpen={setMobileOpen} />
       <Card style={{ maxWidth: 640, margin: "0 auto", textAlign: "center", background: C.primaryDeep, border: "none" }}>
         <img src={LOGO} alt="EcoServe" className="rounded-full mx-auto mb-3" style={{ width: 64, height: 64, objectFit: "cover" }} />
         <div className="ev-serif" style={{ color: "#fff", fontSize: 22, fontWeight: 600 }}>Green Valley Resort</div>
@@ -2436,7 +2442,7 @@ function ProfilePage() {
 
 /* ---------------------------------- forecasting page ---------------------------------- */
 
-function ForecastingPage() {
+function ForecastingPage({ setMobileOpen }) {
   const forecasts = [
     { label: "Electricity", expected: "8,420 kWh", icon: Zap, color: C.primary },
     { label: "Water", expected: "284,000 L", icon: Droplet, color: C.blue },
@@ -2450,7 +2456,7 @@ function ForecastingPage() {
   }));
   return (
     <div>
-      <TopBar title="AI Forecasting" subtitle="Next 7 days, based on historical and occupancy trends" setMobileOpen={() => {}} />
+      <TopBar title="AI Forecasting" subtitle="Next 7 days, based on historical and occupancy trends" setMobileOpen={setMobileOpen} />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {forecasts.map((f) => {
           const I = f.icon;
@@ -2488,7 +2494,7 @@ function ForecastingPage() {
 
 /* ---------------------------------- data input page ---------------------------------- */
 
-function DataInputPage() {
+function DataInputPage({ setMobileOpen }) {
   const fields = [
     "Date", "Occupancy %", "Electricity consumption (kWh)", "Water consumption (L)",
     "Food usage (kg)", "Food waste (kg)", "General waste (kg)", "Recycling (kg)",
@@ -2496,7 +2502,7 @@ function DataInputPage() {
   const [saved, setSaved] = useState(false);
   return (
     <div>
-      <TopBar title="Add Hotel Data" subtitle="Manually log today's consumption figures" setMobileOpen={() => {}} />
+      <TopBar title="Add Hotel Data" subtitle="Manually log today's consumption figures" setMobileOpen={setMobileOpen} />
       <Card style={{ maxWidth: 640 }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           {fields.map((f) => (
@@ -2542,7 +2548,7 @@ function DataInputPage() {
 
 /* ---------------------------------- integrations page ---------------------------------- */
 
-function IntegrationsPage() {
+function IntegrationsPage({ setMobileOpen }) {
   const connected = ["Smart Electricity Meter", "Water Meter", "Hotel Management System"];
   const [available, setAvailable] = useState(["Connect IoT Device", "Connect PMS", "Connect Smart Meter"]);
   const [pending, setPending] = useState(null);
@@ -2560,7 +2566,7 @@ function IntegrationsPage() {
 
   return (
     <div>
-      <TopBar title="Integrations" subtitle="Real-time IoT monitoring coming soon." setMobileOpen={() => {}} />
+      <TopBar title="Integrations" subtitle="Real-time IoT monitoring coming soon." setMobileOpen={setMobileOpen} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <SectionTitle>Connected</SectionTitle>
@@ -2599,7 +2605,7 @@ function IntegrationsPage() {
 
 /* ---------------------------------- settings page ---------------------------------- */
 
-function SettingsPage() {
+function SettingsPage({ setMobileOpen }) {
   const [open, setOpen] = useState(null);
   const rows = [
     { label: "Manager account", detail: "Hotel Manager · manager@greenvalleyresort.lk · Role: Owner/Admin" },
@@ -2609,7 +2615,7 @@ function SettingsPage() {
   ];
   return (
     <div>
-      <TopBar title="Settings" subtitle="Manage your property and account preferences" setMobileOpen={() => {}} />
+      <TopBar title="Settings" subtitle="Manage your property and account preferences" setMobileOpen={setMobileOpen} />
       <Card style={{ maxWidth: 560 }}>
         <div className="flex items-center gap-3 mb-5">
           <Building2 size={22} style={{ color: C.primary }} />
@@ -2997,10 +3003,10 @@ function RealAlertsAndInsights({ summary }) {
   );
 }
 
-function RealDashboardPage({ auth, summary, refreshSummary }) {
+function RealDashboardPage({ auth, summary, refreshSummary, setMobileOpen }) {
   return (
     <div>
-      <TopBar title={`Welcome, ${auth.hotel?.name || ""}`} subtitle={`${auth.hotel?.rooms || ""} rooms · ${auth.hotel?.location || "Sri Lanka"} · live data`} setMobileOpen={() => {}} />
+      <TopBar title={`Welcome, ${auth.hotel?.name || ""}`} subtitle={`${auth.hotel?.rooms || ""} rooms · ${auth.hotel?.location || "Sri Lanka"} · live data`} setMobileOpen={setMobileOpen} />
       {summary.ecoScore == null ? (
         <Card className="text-center" style={{ padding: 48 }}>
           <div className="ev-serif" style={{ fontSize: 18, color: C.ink, marginBottom: 8 }}>No data yet</div>
@@ -3035,16 +3041,16 @@ function RealDashboardPage({ auth, summary, refreshSummary }) {
   );
 }
 
-function RealResourcesPage({ auth }) {
+function RealResourcesPage({ auth, setMobileOpen }) {
   return (
     <div>
-      <TopBar title="Resource Usage" subtitle="Your real, logged consumption by resource type" setMobileOpen={() => {}} />
+      <TopBar title="Resource Usage" subtitle="Your real, logged consumption by resource type" setMobileOpen={setMobileOpen} />
       <RealResourceChart auth={auth} />
     </div>
   );
 }
 
-function RealReportsPage({ auth }) {
+function RealReportsPage({ auth, setMobileOpen }) {
   const [reports, setReports] = useState(null);
   const [error, setError] = useState(null);
   useEffect(() => {
@@ -3053,7 +3059,7 @@ function RealReportsPage({ auth }) {
   }, []);
   return (
     <div>
-      <TopBar title="Sustainability Reports" subtitle="Monthly performance, computed from your logged data" setMobileOpen={() => {}} />
+      <TopBar title="Sustainability Reports" subtitle="Monthly performance, computed from your logged data" setMobileOpen={setMobileOpen} />
       {error && <div className="ev-sans" style={{ color: C.red }}>{error}</div>}
       {reports && reports.length === 0 && <Card><p className="ev-sans" style={{ color: C.muted, fontSize: 13.5 }}>No monthly data yet — keep logging daily figures to build your first report.</p></Card>}
       <div className="space-y-4">
@@ -3075,7 +3081,7 @@ function RealReportsPage({ auth }) {
   );
 }
 
-function RealDataInputPage({ auth, refreshSummary }) {
+function RealDataInputPage({ auth, refreshSummary, setMobileOpen }) {
   const todayStr = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
     date: todayStr, occupancyPct: "", electricityKwh: "", waterL: "", foodKg: "", foodWasteKg: "", generalWasteKg: "", recyclingKg: "",
@@ -3117,7 +3123,7 @@ function RealDataInputPage({ auth, refreshSummary }) {
 
   return (
     <div>
-      <TopBar title="Add Hotel Data" subtitle="Log today's consumption figures — saved to your real account" setMobileOpen={() => {}} />
+      <TopBar title="Add Hotel Data" subtitle="Log today's consumption figures — saved to your real account" setMobileOpen={setMobileOpen} />
       <Card style={{ maxWidth: 640 }}>
         <form onSubmit={submit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -3151,10 +3157,10 @@ function RealDataInputPage({ auth, refreshSummary }) {
   );
 }
 
-function RealSettingsPage({ auth }) {
+function RealSettingsPage({ auth, setMobileOpen }) {
   return (
     <div>
-      <TopBar title="Settings" subtitle="Your account and property details" setMobileOpen={() => {}} />
+      <TopBar title="Settings" subtitle="Your account and property details" setMobileOpen={setMobileOpen} />
       <Card style={{ maxWidth: 480 }}>
         <div className="flex items-center gap-3 mb-5">
           <Building2 size={22} style={{ color: C.primary }} />
@@ -3197,11 +3203,11 @@ function RealApp({ auth }) {
   useEffect(() => { refreshSummary(); }, []);
 
   const pages = {
-    dashboard: <RealDashboardPage auth={auth} summary={summary} refreshSummary={refreshSummary} />,
-    resources: <RealResourcesPage auth={auth} />,
-    data: <RealDataInputPage auth={auth} refreshSummary={refreshSummary} />,
-    reports: <RealReportsPage auth={auth} />,
-    settings: <RealSettingsPage auth={auth} />,
+    dashboard: <RealDashboardPage auth={auth} summary={summary} refreshSummary={refreshSummary} setMobileOpen={setMobileOpen} />,
+    resources: <RealResourcesPage auth={auth} setMobileOpen={setMobileOpen} />,
+    data: <RealDataInputPage auth={auth} refreshSummary={refreshSummary} setMobileOpen={setMobileOpen} />,
+    reports: <RealReportsPage auth={auth} setMobileOpen={setMobileOpen} />,
+    settings: <RealSettingsPage auth={auth} setMobileOpen={setMobileOpen} />,
   };
 
   return (
@@ -3209,13 +3215,20 @@ function RealApp({ auth }) {
       <style>{FONTS}</style>
       <RealSidebar page={page} setPage={setPage} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} hotel={auth.hotel} auth={auth} />
       <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
-        <div className="md:hidden mb-3">
-          <button className="rounded-lg p-2" style={{ border: `1px solid ${C.border}` }} onClick={() => setMobileOpen(true)}><Menu size={18} style={{ color: C.ink }} /></button>
-        </div>
         {loadingSummary && page === "dashboard" ? (
-          <div className="ev-sans" style={{ color: C.muted, padding: 40, textAlign: "center" }}>Loading your dashboard…</div>
+          <>
+            <div className="md:hidden mb-3">
+              <button className="rounded-lg p-2" style={{ border: `1px solid ${C.border}` }} onClick={() => setMobileOpen(true)}><Menu size={18} style={{ color: C.ink }} /></button>
+            </div>
+            <div className="ev-sans" style={{ color: C.muted, padding: 40, textAlign: "center" }}>Loading your dashboard…</div>
+          </>
         ) : summaryError && page === "dashboard" ? (
-          <div className="ev-sans" style={{ color: C.red, padding: 40, textAlign: "center" }}>{summaryError}</div>
+          <>
+            <div className="md:hidden mb-3">
+              <button className="rounded-lg p-2" style={{ border: `1px solid ${C.border}` }} onClick={() => setMobileOpen(true)}><Menu size={18} style={{ color: C.ink }} /></button>
+            </div>
+            <div className="ev-sans" style={{ color: C.red, padding: 40, textAlign: "center" }}>{summaryError}</div>
+          </>
         ) : (
           <div key={page} className="ev-page-enter">{pages[page]}</div>
         )}
@@ -3252,15 +3265,15 @@ function App() {
 
   const pages = {
     dashboard: <DashboardPage setPage={setPage} />,
-    resources: <ResourcesPage />,
-    insights: <InsightsPage />,
-    savings: <SavingsPage />,
-    reports: <ReportsPage />,
-    profile: <ProfilePage />,
-    forecast: <ForecastingPage />,
-    data: <DataInputPage />,
-    integrations: <IntegrationsPage />,
-    settings: <SettingsPage />,
+    resources: <ResourcesPage setMobileOpen={setMobileOpen} />,
+    insights: <InsightsPage setMobileOpen={setMobileOpen} />,
+    savings: <SavingsPage setMobileOpen={setMobileOpen} />,
+    reports: <ReportsPage setMobileOpen={setMobileOpen} />,
+    profile: <ProfilePage setMobileOpen={setMobileOpen} />,
+    forecast: <ForecastingPage setMobileOpen={setMobileOpen} />,
+    data: <DataInputPage setMobileOpen={setMobileOpen} />,
+    integrations: <IntegrationsPage setMobileOpen={setMobileOpen} />,
+    settings: <SettingsPage setMobileOpen={setMobileOpen} />,
   };
 
   const activeLabel = NAV.find((n) => n.key === page)?.label || "Dashboard";
@@ -3270,13 +3283,6 @@ function App() {
       <style>{FONTS}</style>
       <Sidebar page={page} setPage={setPage} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
-        {page !== "dashboard" && (
-          <div className="md:hidden mb-2">
-            <button className="rounded-lg p-2" style={{ border: `1px solid ${C.border}` }} onClick={() => setMobileOpen(true)}>
-              <Menu size={18} style={{ color: C.ink }} />
-            </button>
-          </div>
-        )}
         <div key={page} className="ev-page-enter">
           {page === "dashboard" ? (
             <>
@@ -3578,15 +3584,47 @@ ReactDOM.createRoot(document.getElementById("root")).render(<RootSwitch />);
     }
   });
 
-  /* Contact form (demo only, no backend) */
+  /* Contact / early access form — submits to the real backend */
   var form = document.getElementById('contactForm');
   var success = document.getElementById('contactSuccess');
+  var contactError = document.getElementById('contactError');
+  var contactSubmit = document.getElementById('contactSubmit');
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    form.classList.add('hide');
-    success.classList.add('show');
-    window.fireConfetti(success);
-    window.showToast('<strong>Request received.</strong> We\'ll be in touch about early access.');
+    contactError.style.display = 'none';
+    contactSubmit.disabled = true;
+    contactSubmit.textContent = 'Sending…';
+
+    fetch('/api/early-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('nameInput').value,
+        propertyName: document.getElementById('propertyInput').value,
+        email: document.getElementById('emailInput').value,
+        rooms: document.getElementById('roomCountInput').value,
+      })
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(res.ok){
+          form.classList.add('hide');
+          success.classList.add('show');
+          window.fireConfetti(success);
+          window.showToast('<strong>Request received.</strong> We\'ll be in touch about early access.');
+        } else {
+          contactError.textContent = (res.data && res.data.error) || 'Could not submit your request. Please try again.';
+          contactError.style.display = 'block';
+        }
+      })
+      .catch(function(){
+        contactError.textContent = 'Could not reach the server. Check your connection and try again.';
+        contactError.style.display = 'block';
+      })
+      .finally(function(){
+        contactSubmit.disabled = false;
+        contactSubmit.textContent = 'Send request';
+      });
   });
 
   /* Back to top button */

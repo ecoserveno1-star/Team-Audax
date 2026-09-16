@@ -44,3 +44,12 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_hotel ON chat_messages(hotel_id, created_at);
+
+CREATE TABLE IF NOT EXISTS early_access_requests (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  property_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  rooms INTEGER,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
