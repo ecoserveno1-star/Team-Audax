@@ -175,14 +175,14 @@
   /* ---------- Roadmap ping ---------- */
   .roadmap-item .dot{ position:relative; }
   .roadmap.in .roadmap-item .dot::after{
-    content:''; position:absolute; inset:-1px; border-radius:50%; border:1px solid var(--brass-light);
+    content:''; position:absolute; inset:-3px; border-radius:50%; border:1px solid var(--brass-light);
     animation:ping 2.4s ease-out infinite;
   }
   .roadmap-items .roadmap-item:nth-child(2) .dot::after{ animation-delay:.5s; }
   .roadmap-items .roadmap-item:nth-child(3) .dot::after{ animation-delay:1s; }
   @keyframes ping{
     0%{ transform:scale(1); opacity:.7; }
-    100%{ transform:scale(2.3); opacity:0; }
+    100%{ transform:scale(1.35); opacity:0; }
   }
 
   /* ---------- Button shine + magnetic ---------- */
@@ -520,23 +520,36 @@
   .market .section-head h2{ color:var(--parchment); }
   .market .section-head p{ color:rgba(246,242,231,0.75); }
   .roadmap{ position:relative; margin-top:16px; }
-  .roadmap-line{ position:absolute; top:11px; left:0; right:0; height:1px; background:var(--line-dark); }
+  .roadmap-line{ position:absolute; top:28px; left:0; right:0; height:1px; background:var(--line-dark); }
   .roadmap-line-fill{
-    position:absolute; top:0; left:0; height:1px; width:0%; background:var(--brass-light);
+    position:absolute; top:28px; left:0; height:1px; width:0%; background:var(--brass-light);
     transition:width 1.6s cubic-bezier(.16,.84,.32,1);
   }
-  .roadmap-items{ position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
-  .roadmap-item .dot{
-    width:23px; height:23px; border-radius:50%; background:var(--ink-2); border:1px solid var(--brass-light);
-    display:flex; align-items:center; justify-content:center; margin-bottom:22px;
+  .roadmap-plane{
+    position:absolute; top:28px; left:0; font-size:1.05rem; z-index:2; transform:translate(-50%,-50%) rotate(90deg);
+    opacity:0; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.35));
+    transition:left 1.7s cubic-bezier(.16,.84,.32,1), opacity .4s ease .1s;
   }
-  .roadmap-item .dot::after{ content:''; width:8px; height:8px; border-radius:50%; background:var(--brass-light); }
-  .roadmap-item .phase{ font-size:0.85rem; color:var(--brass-light); margin-bottom:8px; }
+  .roadmap.in .roadmap-plane{ left:100%; opacity:1; }
+  .roadmap-items{ position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
+  .roadmap-item{
+    padding:22px 18px 26px; margin:-22px -18px -26px; border-radius:6px;
+    transition:background .3s ease, transform .3s ease;
+  }
+  .roadmap-item:hover{ background:rgba(246,242,231,0.04); transform:translateY(-3px); }
+  .roadmap-item .dot{
+    width:56px; height:56px; border-radius:50%; background:var(--ink-2); border:1px solid var(--brass-light);
+    display:flex; align-items:center; justify-content:center; margin-bottom:22px;
+    color:var(--brass-light); transition:transform .3s ease, background .3s ease, box-shadow .3s ease;
+  }
+  .roadmap-item .dot svg{ width:24px; height:24px; }
+  .roadmap-item:hover .dot{ transform:scale(1.07); background:rgba(201,167,94,0.14); box-shadow:0 12px 26px rgba(0,0,0,0.3); }
+  .roadmap-item .phase{ font-size:0.85rem; color:var(--brass-light); margin-bottom:8px; font-weight:600; letter-spacing:0.02em; }
   .roadmap-item h3{ font-family:'Fraunces',serif; font-weight:500; font-size:1.15rem; color:var(--parchment); margin-bottom:8px; }
   .roadmap-item p{ font-size:0.95rem; color:rgba(246,242,231,0.7); }
   @media (max-width:760px){
     .roadmap-items{ grid-template-columns:1fr; gap:28px; }
-    .roadmap-line, .roadmap-line-fill{ display:none; }
+    .roadmap-line, .roadmap-line-fill, .roadmap-plane{ display:none; }
   }
 
   /* ---------- Pricing ---------- */
@@ -1220,21 +1233,28 @@
       <div class="roadmap" data-reveal>
         <div class="roadmap-line"></div>
         <div class="roadmap-line-fill" id="roadmapFill"></div>
+        <div class="roadmap-plane" aria-hidden="true">✈️</div>
         <div class="roadmap-items">
           <div class="roadmap-item">
-            <div class="dot"></div>
+            <div class="dot" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </div>
             <div class="phase">Phase one</div>
             <h3>Sri Lanka</h3>
             <p>Hotels, resorts, and boutique stays — proving the platform where it can be tested closely.</p>
           </div>
           <div class="roadmap-item">
-            <div class="dot"></div>
+            <div class="dot" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v14"/><path d="M15 21v-9a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v9"/><path d="M2.5 21h19"/><path d="M7.25 8.5h.01M7.25 12h.01M7.25 15.5h.01M10.75 8.5h.01M10.75 12h.01M10.75 15.5h.01"/></svg>
+            </div>
             <div class="phase">Phase two</div>
             <h3>Wider hospitality</h3>
             <p>Larger hotel chains, restaurants, and serviced apartments join the platform.</p>
           </div>
           <div class="roadmap-item">
-            <div class="dot"></div>
+            <div class="dot" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.4 3.8 5.6 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.6-3.8-9s1.3-6.6 3.8-9z"/></svg>
+            </div>
             <div class="phase">Phase three</div>
             <h3>International markets</h3>
             <p>Expansion beyond Sri Lanka, with deeper smart meter, IoT, and PMS integrations.</p>
