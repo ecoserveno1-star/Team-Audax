@@ -1,0 +1,23 @@
+databases:
+  - name: ecoserve-db
+    databaseName: ecoserve
+    plan: free
+
+services:
+  - type: web
+    name: ecoserve
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecoserve-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: NODE_VERSION
+        value: 20.11.0
