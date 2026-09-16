@@ -87,7 +87,7 @@
   @media (hover:none), (pointer:coarse){ .cursor-glow{ display:none; } }
 
   /* ---------- Glow-zone aurora backdrop (dark sections) ---------- */
-  .glow-zone{ position:relative; }
+  .glow-zone{ position:relative; overflow:hidden; }
   .glow-zone::before{
     content:''; position:absolute; inset:-25%; z-index:0; pointer-events:none;
     background:conic-gradient(from 0deg at 28% 22%, rgba(166,129,60,0.11), rgba(37,84,47,0.10), rgba(166,129,60,0.11));
@@ -255,6 +255,9 @@
     white-space:nowrap;
   }
   .btn:active{ transform:translateY(1px); }
+  @media (max-width:360px){
+    .btn{ white-space:normal; text-align:center; }
+  }
   .btn-primary{ background:var(--forest); color:var(--parchment); }
   .btn-primary:hover{ background:var(--ink); }
   .btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
@@ -749,7 +752,9 @@
     display:flex; gap:20px; width:max-content;
     animation:testiScroll 34s linear infinite;
   }
-  .testimonials:hover .testi-track{ animation-play-state:paused; }
+  @media (hover:hover) and (pointer:fine){
+    .testimonials:hover .testi-track{ animation-play-state:paused; }
+  }
   @keyframes testiScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
   .testi-card{
     flex:none; width:min(78vw, 360px); background:var(--white); border:1px solid var(--line);
@@ -1856,18 +1861,18 @@ function Sidebar({ page, setPage, mobileOpen, setMobileOpen }) {
         className={`fixed md:sticky top-0 z-40 h-screen flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         style={{ width: 248, background: C.primaryDeep, flexShrink: 0 }}
       >
-        <div className="flex items-center gap-3 px-5" style={{ height: 76, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <img src={LOGO} alt="EcoServe" className="rounded-full" style={{ width: 40, height: 40, objectFit: "cover" }} />
+        <div className="flex items-center gap-3 px-5" style={{ height: 60, flex: "none", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <img src={LOGO} alt="EcoServe" className="rounded-full" style={{ width: 32, height: 32, objectFit: "cover" }} />
           <div>
-            <div className="ev-serif" style={{ color: "#fff", fontSize: 17, fontWeight: 600, lineHeight: 1 }}>EcoServe</div>
-            <div className="ev-sans" style={{ color: "rgba(255,255,255,0.55)", fontSize: 10.5, letterSpacing: 0.3, marginTop: 3 }}>Think green. Serve smart.</div>
+            <div className="ev-serif" style={{ color: "#fff", fontSize: 15.5, fontWeight: 600, lineHeight: 1 }}>EcoServe</div>
+            <div className="ev-sans" style={{ color: "rgba(255,255,255,0.55)", fontSize: 9.5, letterSpacing: 0.3, marginTop: 2 }}>Think green. Serve smart.</div>
           </div>
           <button className="ml-auto md:hidden" onClick={() => setMobileOpen(false)} style={{ color: "rgba(255,255,255,0.7)" }}>
             <X size={18} />
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3 px-3">
+        <nav className="flex-1 overflow-y-auto py-2 px-3" style={{ minHeight: 0 }}>
           {NAV.map((item) => {
             const active = page === item.key;
             const Icon = item.icon;
@@ -1875,10 +1880,10 @@ function Sidebar({ page, setPage, mobileOpen, setMobileOpen }) {
               <button
                 key={item.key}
                 onClick={() => { setPage(item.key); setMobileOpen(false); }}
-                className="ev-sans w-full flex items-center gap-3 rounded-xl mb-1 transition-colors"
+                className="ev-sans w-full flex items-center gap-3 rounded-xl mb-0.5 transition-colors"
                 style={{
-                  padding: "9px 12px",
-                  fontSize: 13.5,
+                  padding: "7px 12px",
+                  fontSize: 13,
                   fontWeight: active ? 700 : 500,
                   color: active ? "#fff" : "rgba(255,255,255,0.62)",
                   background: active ? "rgba(255,255,255,0.10)" : "transparent",
@@ -1887,21 +1892,21 @@ function Sidebar({ page, setPage, mobileOpen, setMobileOpen }) {
                 onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
               >
-                <Icon size={17} strokeWidth={2} />
+                <Icon size={16} strokeWidth={2} />
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        <div className="px-4 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="px-4 py-2.5" style={{ flex: "none", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <div className="flex items-center gap-3">
-            <div className="rounded-full flex items-center justify-center ev-serif" style={{ width: 38, height: 38, background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14 }}>
+            <div className="rounded-full flex items-center justify-center ev-serif" style={{ width: 32, height: 32, background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, flex: "none" }}>
               HM
             </div>
             <div>
-              <div className="ev-sans" style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Hotel Manager</div>
-              <div className="ev-sans" style={{ color: "rgba(255,255,255,0.5)", fontSize: 11.5 }}>Green Valley Resort</div>
+              <div className="ev-sans" style={{ color: "#fff", fontSize: 12.5, fontWeight: 700 }}>Hotel Manager</div>
+              <div className="ev-sans" style={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>Green Valley Resort</div>
             </div>
           </div>
         </div>
@@ -1988,7 +1993,7 @@ function ResourceChart() {
     <Card className="col-span-2">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <SectionTitle sub="12% lower than expected this period">Resource Consumption</SectionTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex rounded-lg overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
             {Object.keys(RESOURCE_META).map((r) => (
               <button
@@ -2866,15 +2871,15 @@ function RealSidebar({ page, setPage, mobileOpen, setMobileOpen, hotel, auth }) 
         className={`fixed md:sticky top-0 z-40 h-screen flex flex-col transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         style={{ width: 248, background: C.primaryDeep, flexShrink: 0 }}
       >
-        <div className="flex items-center gap-3 px-5" style={{ height: 76, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <img src={LOGO} alt="EcoServe" className="rounded-full" style={{ width: 40, height: 40, objectFit: "cover" }} />
+        <div className="flex items-center gap-3 px-5" style={{ height: 60, flex: "none", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <img src={LOGO} alt="EcoServe" className="rounded-full" style={{ width: 32, height: 32, objectFit: "cover" }} />
           <div>
-            <div className="ev-serif" style={{ color: "#fff", fontSize: 17, fontWeight: 600, lineHeight: 1 }}>EcoServe</div>
-            <div className="ev-sans" style={{ color: "rgba(255,255,255,0.55)", fontSize: 10.5, letterSpacing: 0.3, marginTop: 3 }}>Your real account</div>
+            <div className="ev-serif" style={{ color: "#fff", fontSize: 15.5, fontWeight: 600, lineHeight: 1 }}>EcoServe</div>
+            <div className="ev-sans" style={{ color: "rgba(255,255,255,0.55)", fontSize: 9.5, letterSpacing: 0.3, marginTop: 2 }}>Your real account</div>
           </div>
           <button className="ml-auto md:hidden" onClick={() => setMobileOpen(false)} style={{ color: "rgba(255,255,255,0.7)" }}><X size={18} /></button>
         </div>
-        <nav className="flex-1 overflow-y-auto py-3 px-3">
+        <nav className="flex-1 overflow-y-auto py-2 px-3" style={{ minHeight: 0 }}>
           {REAL_NAV.map((item) => {
             const active = page === item.key;
             const Icon = item.icon;
@@ -2882,25 +2887,25 @@ function RealSidebar({ page, setPage, mobileOpen, setMobileOpen, hotel, auth }) 
               <button
                 key={item.key}
                 onClick={() => { setPage(item.key); setMobileOpen(false); }}
-                className="ev-sans w-full flex items-center gap-3 rounded-xl mb-1 transition-colors"
-                style={{ padding: "9px 12px", fontSize: 13.5, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.62)", background: active ? "rgba(255,255,255,0.10)" : "transparent", textAlign: "left" }}
+                className="ev-sans w-full flex items-center gap-3 rounded-xl mb-0.5 transition-colors"
+                style={{ padding: "7px 12px", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.62)", background: active ? "rgba(255,255,255,0.10)" : "transparent", textAlign: "left" }}
               >
-                <Icon size={17} /> {item.label}
+                <Icon size={16} /> {item.label}
               </button>
             );
           })}
         </nav>
-        <div className="px-4 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="rounded-full flex items-center justify-center ev-serif" style={{ width: 38, height: 38, background: C.primary, color: "#fff", fontWeight: 700, fontSize: 14 }}>
+        <div className="px-4 py-2.5" style={{ flex: "none", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex items-center gap-3 mb-2.5">
+            <div className="rounded-full flex items-center justify-center ev-serif" style={{ width: 32, height: 32, background: C.primary, color: "#fff", fontWeight: 700, fontSize: 12.5, flex: "none" }}>
               {(hotel?.name || "?").slice(0, 2).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
-              <div className="ev-sans truncate" style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>{hotel?.name}</div>
-              <div className="ev-sans truncate" style={{ color: "rgba(255,255,255,0.5)", fontSize: 11.5 }}>{hotel?.rooms} rooms · {hotel?.location}</div>
+              <div className="ev-sans truncate" style={{ color: "#fff", fontSize: 12.5, fontWeight: 700 }}>{hotel?.name}</div>
+              <div className="ev-sans truncate" style={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{hotel?.rooms} rooms · {hotel?.location}</div>
             </div>
           </div>
-          <button onClick={auth.logout} className="ev-sans w-full flex items-center justify-center gap-2 rounded-lg" style={{ padding: "8px 0", fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.15)" }}>
+          <button onClick={auth.logout} className="ev-sans w-full flex items-center justify-center gap-2 rounded-lg" style={{ padding: "7px 0", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.15)" }}>
             <LogOut size={14} /> Log out
           </button>
         </div>
@@ -2966,7 +2971,7 @@ function RealResourceChart({ auth }) {
     <Card className="col-span-2">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <SectionTitle sub={entries ? `${entries.length} day${entries.length === 1 ? "" : "s"} logged in this period` : "Loading…"}>Resource Consumption</SectionTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex rounded-lg overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
             {Object.keys(REAL_RESOURCE_META).map((r) => (
               <button key={r} onClick={() => setResource(r)} className="ev-sans px-3 py-1.5" style={{ fontSize: 12.5, fontWeight: 700, color: resource === r ? "#fff" : C.inkSoft, background: resource === r ? REAL_RESOURCE_META[r].color : "transparent" }}>
