@@ -625,6 +625,7 @@
   .foot-links a:hover{ color:var(--brass-light); }
   .foot-bottom{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:24px; font-size:0.85rem; color:rgba(246,242,231,0.5); }
   .foot-tag{ font-family:'Fraunces',serif; font-style:italic; }
+  .foot-credit{ text-align:center; margin-top:16px; font-size:0.78rem; color:rgba(246,242,231,0.35); }
 
   /* ---------- Reveal utility ---------- */
   [data-reveal]{ opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease; }
@@ -1434,6 +1435,7 @@
       <span>© 2026 EcoServe. All rights reserved.</span>
       <span class="foot-tag">Think green. Serve smart.</span>
     </div>
+    <div class="foot-credit">Powered by Team Audax</div>
   </div>
 </footer>
 
@@ -3270,6 +3272,7 @@ function RealApp({ auth }) {
         ) : (
           <div key={page} className="ev-page-enter">{pages[page]}</div>
         )}
+        <PoweredByFooter />
       </main>
     </div>
   );
@@ -3286,11 +3289,20 @@ function AuthGate() {
     return <RealApp auth={auth} />;
   }
   return (
-    <div className="ev-sans flex items-center justify-center" style={{ minHeight: "100vh", background: C.bg, padding: 24 }}>
+    <div className="ev-sans flex flex-col items-center justify-center" style={{ minHeight: "100vh", background: C.bg, padding: 24 }}>
       <style>{FONTS}</style>
       <Card style={{ width: "100%", maxWidth: 460, padding: "clamp(28px, 5vw, 44px)" }}>
         {view === "login" ? <LoginForm auth={auth} onSwitch={() => setView("signup")} /> : <SignupForm auth={auth} onSwitch={() => setView("login")} />}
       </Card>
+      <PoweredByFooter />
+    </div>
+  );
+}
+
+function PoweredByFooter() {
+  return (
+    <div className="ev-sans text-center" style={{ color: C.muted, fontSize: 11.5, opacity: 0.7, padding: "28px 0 8px" }}>
+      Powered by Team Audax
     </div>
   );
 }
@@ -3335,6 +3347,7 @@ function App() {
             pages[page]
           )}
         </div>
+        <PoweredByFooter />
       </main>
     </div>
   );
