@@ -1528,20 +1528,45 @@ function ChartLegend({ series }) {
 }
 
 function SimpleChart({ data, xKey, series, height = 260, type = "line", unit = "" }) {
-  const W = 640, H = height, padL = 48, padR = 12, padT = 12, padB = 26;
+  const containerRef = useRef(null);
+  const [measuredWidth, setMeasuredWidth] = useState(640);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0] && entries[0].contentRect.width;
+      if (w && w > 0) setMeasuredWidth(w);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // The viewBox width always matches the container's real pixel width, so the
+  // SVG scales 1:1 with no horizontal stretch — text stays legible regardless
+  // of how narrow the card is (a fixed 640-wide viewBox stretched to fit a
+  // much narrower card was squishing axis labels until they overlapped the bars).
+  const W = measuredWidth, H = height, padL = 48, padR = 12, padT = 12, padB = 26;
   const innerW = W - padL - padR, innerH = H - padT - padB;
   const n = data.length;
   const allVals = series.flatMap((s) => data.map((d) => d[s.key]).filter((v) => v != null));
   const maxV = niceMax(allVals);
   const minV = Math.min(0, ...allVals);
   const x = (i) => padL + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
+  // Bars use a band scale (each category gets an equal-width slot, centered)
+  // rather than the line chart's point scale — a point scale centers the
+  // first/last bars exactly on the plot edges, so half their width spills
+  // into the axis-label gutter and overlaps the tick text.
+  const bandW = innerW / Math.max(n, 1);
+  const xBand = (i) => padL + bandW * (i + 0.5);
   const y = (v) => padT + innerH - ((v - minV) / (maxV - minV || 1)) * innerH;
   const [hover, setHover] = useState(null);
 
   const handleMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = ((e.clientX - rect.left) / rect.width) * W;
-    let idx = Math.round(((relX - padL) / innerW) * (n - 1));
+    let idx = type === "bar"
+      ? Math.floor((relX - padL) / bandW)
+      : Math.round(((relX - padL) / innerW) * (n - 1));
     idx = Math.max(0, Math.min(n - 1, idx));
     setHover(idx);
   };
@@ -1551,7 +1576,7 @@ function SimpleChart({ data, xKey, series, height = 260, type = "line", unit = "
   const labelEvery = Math.max(1, Math.ceil(n / (type === "bar" ? 10 : 8)));
 
   return (
-    <div style={{ position: "relative" }}>
+    <div ref={containerRef} style={{ position: "relative" }}>
       <svg
         viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none"
         onMouseMove={handleMove} onMouseLeave={() => setHover(null)}
@@ -1567,16 +1592,16 @@ function SimpleChart({ data, xKey, series, height = 260, type = "line", unit = "
         ))}
 
         {data.map((d, i) => ((i % labelEvery === 0 || i === n - 1) ? (
-          <text key={i} x={x(i)} y={H - 6} fontSize="9.5" textAnchor="middle" fill={C.muted} fontFamily="Inter">
+          <text key={i} x={type === "bar" ? xBand(i) : x(i)} y={H - 6} fontSize="9.5" textAnchor="middle" fill={C.muted} fontFamily="Inter">
             {d[xKey]}
           </text>
         ) : null))}
 
         {type === "bar" && series.map((s) => {
-          const bw = Math.max(4, (innerW / n) * 0.55);
+          const bw = Math.max(4, Math.min(bandW * 0.55, 56));
           return data.map((d, i) => (d[s.key] == null ? null : (
             <rect
-              key={s.key + i} x={x(i) - bw / 2} y={y(d[s.key])} width={bw} height={Math.max(0, y(minV) - y(d[s.key]))}
+              key={s.key + i} x={xBand(i) - bw / 2} y={y(d[s.key])} width={bw} height={Math.max(0, y(minV) - y(d[s.key]))}
               rx={5} fill={s.color} opacity={hover === i ? 1 : 0.88}
             />
           )));
@@ -1598,7 +1623,7 @@ function SimpleChart({ data, xKey, series, height = 260, type = "line", unit = "
           );
         })}
 
-        {hover != null && <line x1={x(hover)} x2={x(hover)} y1={padT} y2={H - padB} stroke={C.ink} strokeOpacity={0.12} strokeWidth={1} />}
+        {hover != null && <line x1={type === "bar" ? xBand(hover) : x(hover)} x2={type === "bar" ? xBand(hover) : x(hover)} y1={padT} y2={H - padB} stroke={C.ink} strokeOpacity={0.12} strokeWidth={1} />}
       </svg>
 
       {hover != null && (
@@ -1607,7 +1632,7 @@ function SimpleChart({ data, xKey, series, height = 260, type = "line", unit = "
           style={{
             position: "absolute", top: 6, pointerEvents: "none", background: "#fff", border: `1px solid ${C.border}`,
             borderRadius: 10, padding: "7px 11px", fontSize: 11.5, boxShadow: "0 8px 22px -8px rgba(15,59,44,0.25)",
-            left: `${Math.min(Math.max((x(hover) / W) * 100, 14), 82)}%`, transform: "translateX(-50%)", whiteSpace: "nowrap",
+            left: `${Math.min(Math.max(((type === "bar" ? xBand(hover) : x(hover)) / W) * 100, 14), 82)}%`, transform: "translateX(-50%)", whiteSpace: "nowrap",
           }}
         >
           <div style={{ fontWeight: 800, color: C.ink, marginBottom: 2 }}>{data[hover][xKey]}</div>
