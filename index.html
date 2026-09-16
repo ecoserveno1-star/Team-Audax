@@ -1154,7 +1154,7 @@
 
           <div class="dash-panel">
             <h3>Savings Score</h3>
-            <div class="savings-num">$<span id="savingsNum">0</span></div>
+            <div class="savings-num">LKR <span id="savingsNum">0</span></div>
             <div class="savings-sub">Saved this quarter through better resource use</div>
             <svg class="sparkline" viewBox="0 0 300 64" preserveAspectRatio="none">
               <path class="area" id="sparkArea" d="M0,54 L40,50 L80,44 L120,46 L160,34 L200,30 L240,18 L300,10 L300,64 L0,64 Z"></path>
@@ -3569,7 +3569,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<RootSwitch />);
           var dRing = document.getElementById('dashRing');
           dRing.style.strokeDashoffset = 364.4 * (1 - 0.87);
           animateCount(document.getElementById('dashScoreNum'), 87, 1300);
-          animateCount(document.getElementById('savingsNum'), 18240, 1500, '$', function(v){ return v.toLocaleString(); });
+          animateCount(document.getElementById('savingsNum'), 852000, 1500, 'LKR ', function(v){ return v.toLocaleString(); });
           document.getElementById('sparkLine').style.strokeDashoffset = 0;
           document.getElementById('sparkArea').style.opacity = 1;
           document.querySelectorAll('.bar-fill').forEach(function(bar){
