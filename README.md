@@ -51,3 +51,11 @@ Then open `http://localhost:3000`.
   utility rates used for the cost estimates).
 - "Launch live demo" (separate from login) shows a sample/mock dashboard for
   exploring the UI without an account — it doesn't touch the database.
+
+## Admin page
+
+`/admin` (e.g. `https://your-service.onrender.com/admin`) shows every
+"Request early access" submission and every registered hotel account, in
+plain tables — no SQL needed. It's protected by a single shared password:
+set `ADMIN_PASSWORD` in the service's **Environment** tab on Render (or in
+your local `.env`). Without it set, `/admin` refuses every login attempt.

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoServe — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16301F; --ink-2:#1E3E28; --forest:#25542F; --parchment:#F6F2E7; --parchment-2:#EFE9D8;
+    --brass:#A6813C; --brass-light:#C9A75E; --sage:#E4E9DD; --ink-soft:#3C4A3E; --line: rgba(22,48,31,0.14);
+    --red:#B14B3A;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  body{
+    margin:0; font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color:var(--ink);
+    background:var(--parchment); line-height:1.5;
+  }
+  h1,h2{ font-family:'Fraunces', Georgia, serif; font-weight:500; margin:0; }
+  .wrap{ max-width:1000px; margin:0 auto; padding:40px 24px 80px; }
+  .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; }
+  .top h1{ font-size:1.6rem; }
+  .top .tag{ color:var(--ink-soft); font-size:0.9rem; margin-top:2px; }
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; padding:10px 20px; border-radius:4px;
+    font-size:0.92rem; font-weight:600; border:1px solid transparent; background:var(--forest); color:var(--parchment);
+    transition:background .2s ease;
+  }
+  .btn:hover{ background:var(--ink); }
+  .btn:disabled{ opacity:0.6; cursor:default; }
+  .btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn-ghost:hover{ background:rgba(22,48,31,0.05); }
+
+  #loginScreen{ display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .login-card{
+    background:#fff; border:1px solid var(--line); border-radius:6px; padding:clamp(28px,5vw,40px);
+    width:100%; max-width:380px; box-shadow:0 20px 50px rgba(22,48,31,0.08);
+  }
+  .login-card h1{ font-size:1.5rem; text-align:center; margin-bottom:8px; }
+  .login-card p{ text-align:center; color:var(--ink-soft); font-size:0.9rem; margin-bottom:24px; }
+  .field label{ display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px; }
+  .field input{
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:4px; font-size:0.95rem;
+    font-family:inherit; background:var(--parchment); color:var(--ink); outline:none; margin-bottom:16px;
+  }
+  .field input:focus{ border-color:var(--forest); }
+  .error{ color:var(--red); font-size:0.85rem; margin-bottom:14px; display:none; }
+
+  #dashboard{ display:none; }
+  .section{ margin-bottom:40px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .section-head h2{ font-size:1.2rem; }
+  .count{ font-size:0.85rem; color:var(--ink-soft); }
+
+  table{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  th, td{ text-align:left; padding:12px 14px; font-size:0.88rem; border-bottom:1px solid var(--line); }
+  th{ background:var(--sage); font-weight:700; color:var(--ink-soft); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.03em; }
+  tr:last-child td{ border-bottom:none; }
+  tr:hover td{ background:rgba(37,84,47,0.03); }
+  .empty{ padding:28px; text-align:center; color:var(--ink-soft); font-size:0.9rem; background:#fff; border:1px solid var(--line); border-radius:6px; }
+  .loading{ padding:28px; text-align:center; color:var(--ink-soft); font-size:0.9rem; }
+
+  @media (max-width:640px){
+    table, thead, tbody, th, td, tr{ display:block; }
+    thead{ display:none; }
+    tr{ background:#fff; border:1px solid var(--line); border-radius:6px; margin-bottom:10px; padding:8px 0; }
+    td{ border:none; padding:6px 14px; }
+    td::before{ content:attr(data-label); display:block; font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>EcoServe Admin</h1>
+    <p>Enter the admin password to view submitted data.</p>
+    <div class="error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" required autofocus>
+      </div>
+      <button type="submit" class="btn" style="width:100%;" id="loginBtn">Log in</button>
+    </form>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>EcoServe Admin</h1>
+        <div class="tag">Early access requests &amp; registered hotels</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-ghost" id="refreshBtn">Refresh</button>
+        <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Early access requests</h2>
+        <span class="count" id="earlyAccessCount"></span>
+      </div>
+      <div id="earlyAccessContainer"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Registered hotels</h2>
+        <span class="count" id="hotelsCount"></span>
+      </div>
+      <div id="hotelsContainer"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TOKEN_KEY = 'ecoserve_admin_token';
+
+  var loginScreen = document.getElementById('loginScreen');
+  var dashboard = document.getElementById('dashboard');
+  var loginForm = document.getElementById('loginForm');
+  var loginError = document.getElementById('loginError');
+  var loginBtn = document.getElementById('loginBtn');
+  var passwordInput = document.getElementById('passwordInput');
+
+  function getToken(){ try { return localStorage.getItem(TOKEN_KEY); } catch(e){ return null; } }
+  function setToken(t){ try { localStorage.setItem(TOKEN_KEY, t); } catch(e){} }
+  function clearToken(){ try { localStorage.removeItem(TOKEN_KEY); } catch(e){} }
+
+  function fmtDate(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) + ' ' +
+      d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function showDashboard(){
+    loginScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    loadAll();
+  }
+  function showLogin(msg){
+    dashboard.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    if (msg) { loginError.textContent = msg; loginError.style.display = 'block'; }
+  }
+
+  async function apiFetch(path, opts){
+    opts = opts || {};
+    var headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    var token = getToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
+    var res = await fetch(path, Object.assign({}, opts, { headers: headers }));
+    var data = await res.json().catch(function(){ return {}; });
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    loginError.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Logging in…';
+    fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: passwordInput.value })
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if (res.ok) {
+          setToken(res.data.token);
+          passwordInput.value = '';
+          showDashboard();
+        } else {
+          loginError.textContent = res.data.error || 'Could not log in.';
+          loginError.style.display = 'block';
+        }
+      })
+      .catch(function(){
+        loginError.textContent = 'Could not reach the server.';
+        loginError.style.display = 'block';
+      })
+      .finally(function(){
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Log in';
+      });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    clearToken();
+    showLogin();
+  });
+  document.getElementById('refreshBtn').addEventListener('click', loadAll);
+
+  function renderEarlyAccess(rows){
+    var container = document.getElementById('earlyAccessContainer');
+    document.getElementById('earlyAccessCount').textContent = rows.length + (rows.length === 1 ? ' request' : ' requests');
+    if (!rows.length) {
+      container.innerHTML = '<div class="empty">No early access requests yet.</div>';
+      return;
+    }
+    var rowsHtml = rows.map(function(r){
+      return '<tr>' +
+        '<td data-label="Name">' + escapeHtml(r.name) + '</td>' +
+        '<td data-label="Property">' + escapeHtml(r.property_name) + '</td>' +
+        '<td data-label="Email">' + escapeHtml(r.email) + '</td>' +
+        '<td data-label="Rooms">' + (r.rooms != null ? escapeHtml(r.rooms) : '—') + '</td>' +
+        '<td data-label="Submitted">' + escapeHtml(fmtDate(r.created_at)) + '</td>' +
+      '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Name</th><th>Property</th><th>Email</th><th>Rooms</th><th>Submitted</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+  }
+
+  function renderHotels(rows){
+    var container = document.getElementById('hotelsContainer');
+    document.getElementById('hotelsCount').textContent = rows.length + (rows.length === 1 ? ' account' : ' accounts');
+    if (!rows.length) {
+      container.innerHTML = '<div class="empty">No registered hotels yet.</div>';
+      return;
+    }
+    var rowsHtml = rows.map(function(r){
+      return '<tr>' +
+        '<td data-label="Property">' + escapeHtml(r.name) + '</td>' +
+        '<td data-label="Email">' + escapeHtml(r.email) + '</td>' +
+        '<td data-label="Rooms">' + escapeHtml(r.rooms) + '</td>' +
+        '<td data-label="Location">' + escapeHtml(r.location || '—') + '</td>' +
+        '<td data-label="Tier">' + escapeHtml(r.tier) + '</td>' +
+        '<td data-label="Joined">' + escapeHtml(fmtDate(r.created_at)) + '</td>' +
+      '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Property</th><th>Email</th><th>Rooms</th><th>Location</th><th>Tier</th><th>Joined</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+  }
+
+  function loadAll(){
+    apiFetch('/api/admin/early-access')
+      .then(function(data){ renderEarlyAccess(data.requests); })
+      .catch(function(err){
+        document.getElementById('earlyAccessContainer').innerHTML = '<div class="empty">' + escapeHtml(err.message) + '</div>';
+        if (/session|authenticated|authorized/i.test(err.message)) { clearToken(); showLogin(); }
+      });
+    apiFetch('/api/admin/hotels')
+      .then(function(data){ renderHotels(data.hotels); })
+      .catch(function(err){
+        document.getElementById('hotelsContainer').innerHTML = '<div class="empty">' + escapeHtml(err.message) + '</div>';
+      });
+  }
+
+  if (getToken()) { showDashboard(); } else { showLogin(); }
+})();
+</script>
+
+</body>
+</html>

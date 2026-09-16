@@ -8,6 +8,7 @@ const usageRoutes = require("./routes/usage");
 const dashboardRoutes = require("./routes/dashboard");
 const chatRoutes = require("./routes/chat");
 const earlyAccessRoutes = require("./routes/earlyAccess");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,11 @@ app.use("/api/usage", usageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/early-access", earlyAccessRoutes);
+app.use("/api/admin", adminRoutes);
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "admin.html"));
+});
 
 app.use(express.static(path.join(__dirname, "..")));
 
