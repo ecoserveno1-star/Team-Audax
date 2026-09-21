@@ -19,8 +19,8 @@
     background:var(--parchment); line-height:1.5;
   }
   h1,h2{ font-family:'Fraunces', Georgia, serif; font-weight:500; margin:0; }
-  .wrap{ max-width:1000px; margin:0 auto; padding:40px 24px 80px; }
-  .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:40px 24px 80px; }
+  .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
   .top h1{ font-size:1.6rem; }
   .top .tag{ color:var(--ink-soft); font-size:0.9rem; margin-top:2px; }
   button{ font-family:inherit; cursor:pointer; }
@@ -33,6 +33,9 @@
   .btn:disabled{ opacity:0.6; cursor:default; }
   .btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
   .btn-ghost:hover{ background:rgba(22,48,31,0.05); }
+  .btn-sm{ padding:6px 12px; font-size:0.8rem; border-radius:4px; }
+  .btn-danger{ background:transparent; color:var(--red); border:1px solid var(--red); }
+  .btn-danger:hover{ background:rgba(177,75,58,0.08); }
 
   #loginScreen{ display:flex; align-items:center; justify-content:center; min-height:100vh; }
   .login-card{
@@ -41,18 +44,21 @@
   }
   .login-card h1{ font-size:1.5rem; text-align:center; margin-bottom:8px; }
   .login-card p{ text-align:center; color:var(--ink-soft); font-size:0.9rem; margin-bottom:24px; }
+  .field{ margin-bottom:16px; }
   .field label{ display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px; }
-  .field input{
+  .field input, .field select{
     width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:4px; font-size:0.95rem;
-    font-family:inherit; background:var(--parchment); color:var(--ink); outline:none; margin-bottom:16px;
+    font-family:inherit; background:var(--parchment); color:var(--ink); outline:none;
   }
-  .field input:focus{ border-color:var(--forest); }
+  .field input:focus, .field select:focus{ border-color:var(--forest); }
+  .field .hint{ font-size:0.78rem; color:var(--ink-soft); margin-top:4px; }
   .error{ color:var(--red); font-size:0.85rem; margin-bottom:14px; display:none; }
 
   #dashboard{ display:none; }
   .section{ margin-bottom:40px; }
-  .section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
   .section-head h2{ font-size:1.2rem; }
+  .section-head .head-right{ display:flex; align-items:center; gap:14px; }
   .count{ font-size:0.85rem; color:var(--ink-soft); }
 
   table{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
@@ -62,6 +68,7 @@
   tr:hover td{ background:rgba(37,84,47,0.03); }
   .empty{ padding:28px; text-align:center; color:var(--ink-soft); font-size:0.9rem; background:#fff; border:1px solid var(--line); border-radius:6px; }
   .loading{ padding:28px; text-align:center; color:var(--ink-soft); font-size:0.9rem; }
+  .actions-cell{ display:flex; gap:8px; }
 
   @media (max-width:640px){
     table, thead, tbody, th, td, tr{ display:block; }
@@ -69,7 +76,20 @@
     tr{ background:#fff; border:1px solid var(--line); border-radius:6px; margin-bottom:10px; padding:8px 0; }
     td{ border:none; padding:6px 14px; }
     td::before{ content:attr(data-label); display:block; font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px; }
+    .actions-cell{ padding-top:4px; }
   }
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(22,48,31,0.45);
+    align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    background:#fff; border-radius:6px; padding:clamp(22px,4vw,32px); width:100%; max-width:440px;
+    max-height:90vh; overflow-y:auto; box-shadow:0 24px 60px rgba(22,48,31,0.25);
+  }
+  .modal-card h2{ font-size:1.25rem; margin-bottom:18px; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
 </style>
 </head>
 <body>
@@ -77,7 +97,7 @@
 <div id="loginScreen">
   <div class="login-card">
     <h1>EcoServe Admin</h1>
-    <p>Enter the admin password to view submitted data.</p>
+    <p>Enter the admin password to manage submitted data.</p>
     <div class="error" id="loginError"></div>
     <form id="loginForm">
       <div class="field">
@@ -105,7 +125,10 @@
     <div class="section">
       <div class="section-head">
         <h2>Early access requests</h2>
-        <span class="count" id="earlyAccessCount"></span>
+        <div class="head-right">
+          <span class="count" id="earlyAccessCount"></span>
+          <button class="btn btn-sm" id="addEarlyAccessBtn">+ Add request</button>
+        </div>
       </div>
       <div id="earlyAccessContainer"><div class="loading">Loading…</div></div>
     </div>
@@ -113,10 +136,21 @@
     <div class="section">
       <div class="section-head">
         <h2>Registered hotels</h2>
-        <span class="count" id="hotelsCount"></span>
+        <div class="head-right">
+          <span class="count" id="hotelsCount"></span>
+          <button class="btn btn-sm" id="addHotelBtn">+ Add hotel</button>
+        </div>
       </div>
       <div id="hotelsContainer"><div class="loading">Loading…</div></div>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <h2 id="modalTitle"></h2>
+    <div class="error" id="modalError"></div>
+    <form id="modalForm"></form>
   </div>
 </div>
 
@@ -130,6 +164,9 @@
   var loginError = document.getElementById('loginError');
   var loginBtn = document.getElementById('loginBtn');
   var passwordInput = document.getElementById('passwordInput');
+
+  var lastEarlyAccess = [];
+  var lastHotels = [];
 
   function getToken(){ try { return localStorage.getItem(TOKEN_KEY); } catch(e){ return null; } }
   function setToken(t){ try { localStorage.setItem(TOKEN_KEY, t); } catch(e){} }
@@ -206,7 +243,194 @@
   });
   document.getElementById('refreshBtn').addEventListener('click', loadAll);
 
+  /* ---------------------------------- generic modal ---------------------------------- */
+
+  var modalOverlay = document.getElementById('modalOverlay');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalError = document.getElementById('modalError');
+  var modalForm = document.getElementById('modalForm');
+  var activeSubmit = null;
+
+  function fieldHtml(f, value){
+    var id = 'f_' + f.key;
+    var val = value == null ? '' : value;
+    var label = '<label for="' + id + '">' + escapeHtml(f.label) + '</label>';
+    var hint = f.hint ? '<div class="hint">' + escapeHtml(f.hint) + '</div>' : '';
+    if (f.type === 'select') {
+      var opts = f.options.map(function(o){
+        return '<option value="' + escapeHtml(o) + '"' + (o === val ? ' selected' : '') + '>' + escapeHtml(o) + '</option>';
+      }).join('');
+      return '<div class="field">' + label + '<select id="' + id + '" name="' + f.key + '">' + opts + '</select>' + hint + '</div>';
+    }
+    return '<div class="field">' + label +
+      '<input type="' + f.type + '" id="' + id + '" name="' + f.key + '" value="' + escapeHtml(val) + '"' +
+      (f.required ? ' required' : '') + (f.placeholder ? ' placeholder="' + escapeHtml(f.placeholder) + '"' : '') +
+      (f.type === 'number' ? ' min="' + (f.min != null ? f.min : 0) + '" max="' + (f.max != null ? f.max : 100000) + '"' : '') +
+      '></div>';
+  }
+
+  function openModal(opts){
+    modalTitle.textContent = opts.title;
+    modalError.style.display = 'none';
+    modalError.textContent = '';
+    var fieldsHtml = opts.fields.map(function(f){
+      return fieldHtml(f, opts.initial ? opts.initial[f.key] : '');
+    }).join('');
+    modalForm.innerHTML = fieldsHtml +
+      '<div class="modal-actions">' +
+        '<button type="button" class="btn btn-ghost" id="modalCancelBtn">Cancel</button>' +
+        '<button type="submit" class="btn" id="modalSaveBtn">' + escapeHtml(opts.submitLabel || 'Save') + '</button>' +
+      '</div>';
+    activeSubmit = opts.onSubmit;
+    modalOverlay.classList.add('open');
+    var firstInput = modalForm.querySelector('input, select');
+    if (firstInput) firstInput.focus();
+  }
+
+  function closeModal(){
+    modalOverlay.classList.remove('open');
+    modalForm.innerHTML = '';
+    activeSubmit = null;
+  }
+
+  modalOverlay.addEventListener('click', function(e){
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+  });
+  modalForm.addEventListener('click', function(e){
+    if (e.target && e.target.id === 'modalCancelBtn') closeModal();
+  });
+  modalForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!activeSubmit) return;
+    var formData = {};
+    Array.prototype.forEach.call(modalForm.elements, function(el){
+      if (el.name) formData[el.name] = el.value;
+    });
+    var saveBtn = document.getElementById('modalSaveBtn');
+    saveBtn.disabled = true;
+    var originalLabel = saveBtn.textContent;
+    saveBtn.textContent = 'Saving…';
+    modalError.style.display = 'none';
+    activeSubmit(formData)
+      .then(function(){
+        closeModal();
+        loadAll();
+      })
+      .catch(function(err){
+        modalError.textContent = err.message || 'Something went wrong.';
+        modalError.style.display = 'block';
+      })
+      .finally(function(){
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalLabel;
+      });
+  });
+
+  /* ---------------------------------- early access requests ---------------------------------- */
+
+  var EARLY_ACCESS_FIELDS = [
+    { key:'name', label:'Name', type:'text', required:true },
+    { key:'propertyName', label:'Property name', type:'text', required:true },
+    { key:'email', label:'Email', type:'email', required:true },
+    { key:'rooms', label:'Rooms (optional)', type:'number', required:false, min:1, max:5000 }
+  ];
+
+  document.getElementById('addEarlyAccessBtn').addEventListener('click', function(){
+    openModal({
+      title: 'Add early access request',
+      fields: EARLY_ACCESS_FIELDS,
+      submitLabel: 'Add request',
+      onSubmit: function(data){
+        return apiFetch('/api/admin/early-access', { method: 'POST', body: JSON.stringify(data) });
+      }
+    });
+  });
+
+  function editEarlyAccess(id){
+    var row = lastEarlyAccess.find(function(r){ return String(r.id) === String(id); });
+    if (!row) return;
+    openModal({
+      title: 'Edit early access request',
+      fields: EARLY_ACCESS_FIELDS,
+      initial: { name: row.name, propertyName: row.property_name, email: row.email, rooms: row.rooms },
+      submitLabel: 'Save changes',
+      onSubmit: function(data){
+        return apiFetch('/api/admin/early-access/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      }
+    });
+  }
+
+  function deleteEarlyAccess(id, label){
+    if (!window.confirm('Delete the request from "' + label + '"? This cannot be undone.')) return;
+    apiFetch('/api/admin/early-access/' + id, { method: 'DELETE' })
+      .then(loadAll)
+      .catch(function(err){ window.alert(err.message || 'Could not delete the request.'); });
+  }
+
+  /* ---------------------------------- hotel accounts ---------------------------------- */
+
+  var TIER_OPTIONS = ['boutique', 'resort', 'enterprise'];
+
+  var HOTEL_CREATE_FIELDS = [
+    { key:'hotelName', label:'Property name', type:'text', required:true },
+    { key:'email', label:'Email', type:'email', required:true },
+    { key:'password', label:'Password', type:'password', required:true, hint:'At least 8 characters.' },
+    { key:'location', label:'Location', type:'text', required:false, placeholder:'Sri Lanka' },
+    { key:'rooms', label:'Rooms', type:'number', required:true, min:1, max:2000 },
+    { key:'tier', label:'Tier', type:'select', options: TIER_OPTIONS, required:true }
+  ];
+
+  function hotelEditFields(){
+    return [
+      { key:'name', label:'Property name', type:'text', required:true },
+      { key:'location', label:'Location', type:'text', required:false },
+      { key:'rooms', label:'Rooms', type:'number', required:true, min:1, max:2000 },
+      { key:'tier', label:'Tier', type:'select', options: TIER_OPTIONS, required:true },
+      { key:'newPassword', label:'New password', type:'password', required:false, hint:'Leave blank to keep the current password. At least 8 characters if set.' }
+    ];
+  }
+
+  document.getElementById('addHotelBtn').addEventListener('click', function(){
+    openModal({
+      title: 'Add hotel account',
+      fields: HOTEL_CREATE_FIELDS,
+      initial: { tier: 'boutique', rooms: 50 },
+      submitLabel: 'Create account',
+      onSubmit: function(data){
+        return apiFetch('/api/admin/hotels', { method: 'POST', body: JSON.stringify(data) });
+      }
+    });
+  });
+
+  function editHotel(id){
+    var row = lastHotels.find(function(r){ return String(r.id) === String(id); });
+    if (!row) return;
+    openModal({
+      title: 'Edit ' + row.name,
+      fields: hotelEditFields(),
+      initial: { name: row.name, location: row.location, rooms: row.rooms, tier: row.tier, newPassword: '' },
+      submitLabel: 'Save changes',
+      onSubmit: function(data){
+        if (!data.newPassword) delete data.newPassword;
+        return apiFetch('/api/admin/hotels/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      }
+    });
+  }
+
+  function deleteHotel(id, label){
+    if (!window.confirm('Delete the account for "' + label + '"? This removes their login and all their usage data. This cannot be undone.')) return;
+    apiFetch('/api/admin/hotels/' + id, { method: 'DELETE' })
+      .then(loadAll)
+      .catch(function(err){ window.alert(err.message || 'Could not delete the account.'); });
+  }
+
+  /* ---------------------------------- rendering ---------------------------------- */
+
   function renderEarlyAccess(rows){
+    lastEarlyAccess = rows;
     var container = document.getElementById('earlyAccessContainer');
     document.getElementById('earlyAccessCount').textContent = rows.length + (rows.length === 1 ? ' request' : ' requests');
     if (!rows.length) {
@@ -220,12 +444,28 @@
         '<td data-label="Email">' + escapeHtml(r.email) + '</td>' +
         '<td data-label="Rooms">' + (r.rooms != null ? escapeHtml(r.rooms) : '—') + '</td>' +
         '<td data-label="Submitted">' + escapeHtml(fmtDate(r.created_at)) + '</td>' +
+        '<td data-label="Actions"><div class="actions-cell">' +
+          '<button class="btn btn-ghost btn-sm" data-edit-ea="' + r.id + '">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" data-delete-ea="' + r.id + '">Delete</button>' +
+        '</div></td>' +
       '</tr>';
     }).join('');
-    container.innerHTML = '<table><thead><tr><th>Name</th><th>Property</th><th>Email</th><th>Rooms</th><th>Submitted</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+    container.innerHTML = '<table><thead><tr><th>Name</th><th>Property</th><th>Email</th><th>Rooms</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+
+    container.querySelectorAll('[data-edit-ea]').forEach(function(btn){
+      btn.addEventListener('click', function(){ editEarlyAccess(btn.getAttribute('data-edit-ea')); });
+    });
+    container.querySelectorAll('[data-delete-ea]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-delete-ea');
+        var row = lastEarlyAccess.find(function(r){ return String(r.id) === String(id); });
+        deleteEarlyAccess(id, row ? row.name : '');
+      });
+    });
   }
 
   function renderHotels(rows){
+    lastHotels = rows;
     var container = document.getElementById('hotelsContainer');
     document.getElementById('hotelsCount').textContent = rows.length + (rows.length === 1 ? ' account' : ' accounts');
     if (!rows.length) {
@@ -240,9 +480,24 @@
         '<td data-label="Location">' + escapeHtml(r.location || '—') + '</td>' +
         '<td data-label="Tier">' + escapeHtml(r.tier) + '</td>' +
         '<td data-label="Joined">' + escapeHtml(fmtDate(r.created_at)) + '</td>' +
+        '<td data-label="Actions"><div class="actions-cell">' +
+          '<button class="btn btn-ghost btn-sm" data-edit-hotel="' + r.id + '">Edit</button>' +
+          '<button class="btn btn-danger btn-sm" data-delete-hotel="' + r.id + '">Delete</button>' +
+        '</div></td>' +
       '</tr>';
     }).join('');
-    container.innerHTML = '<table><thead><tr><th>Property</th><th>Email</th><th>Rooms</th><th>Location</th><th>Tier</th><th>Joined</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+    container.innerHTML = '<table><thead><tr><th>Property</th><th>Email</th><th>Rooms</th><th>Location</th><th>Tier</th><th>Joined</th><th>Actions</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+
+    container.querySelectorAll('[data-edit-hotel]').forEach(function(btn){
+      btn.addEventListener('click', function(){ editHotel(btn.getAttribute('data-edit-hotel')); });
+    });
+    container.querySelectorAll('[data-delete-hotel]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-delete-hotel');
+        var row = lastHotels.find(function(r){ return String(r.id) === String(id); });
+        deleteHotel(id, row ? row.name : '');
+      });
+    });
   }
 
   function loadAll(){
